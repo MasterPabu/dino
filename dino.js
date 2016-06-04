@@ -13,20 +13,36 @@ bgImage.onload = function () {
 };
 bgImage.src = "images/bg.png";
 
+//tree image
+var treeReady = false;
+var treeImage = new Image();
+treeImage.onload = function () {
+	treeReady = true;
+}
+treeImage.src = "images/tree.png";
+
 // dino image
 var dinoReady = false;
 var dinoImage = new Image();
 dinoImage.onload = function () {
 	dinoReady = true;
 };
-
 dinoImage.src = "images/dino.png";
+
 var dino = {
-	speed: 10, // movement in pixels per second
+	speed: 17, // movement in pixels per second
 	x: 100,
 	y: 450,
+	width: dinoImage.width,
+	height: 150,
 	jumping: false,
-	vel_y: 0
+	vel: 0
+};
+var tree = {
+	width: 138,
+	height: 150,
+	x: 2000,
+	y: 450
 };
 
 var keysDown = {};
@@ -39,38 +55,96 @@ addEventListener("keyup", function (e) {
 	keysDown[e.keyCode] = false;
 }, false);
 
+function colCheck(shapeA, shapeB) {
+    // get the vectors to check against
+    var vX = (shapeA.x + (shapeA.width / 2)) - (shapeB.x + (shapeB.width / 2)),
+        vY = (shapeA.y + (shapeA.height / 2)) - (shapeB.y + (shapeB.height / 2)),
+        // add the half widths and half heights of the objects
+        hWidths = (shapeA.width / 2) + (shapeB.width / 2),
+        hHeights = (shapeA.height / 2) + (shapeB.height / 2),
+        colDir = null;
+    if (Math.abs(vX) < hWidths && Math.abs(vY) < hHeights) {   
+            if (vY > 0) {
+                colDir = "t";
+                shapeA.y += oY;
+            } else {
+                colDir = "b";
+                shapeA.y -= oY;
+            }
+        } else {
+            if (vX > 0) {
+                colDir = "l";
+                shapeA.x += oX;
+            } else {
+                colDir = "r";
+                shapeA.x -= oX;
+            }
+        }
+    
+    return colDir;
+}
+
+var gravity = 3 ;  // 2 -> Easy --- 3 -> HARD
 var keys = function () {
 	if (keysDown[32]) { // Player holding space
 		if(!dino.jumping) {
    			dino.jumping = true;
-   			dino.vel_y = -dino.speed*2;
+   			dino.vel = -dino.speed*2;
    		}
 	}
+
 };
 var xpos = 0;
+var game_over=false;
+var score = 0;
 var render = function () {
 	if (bgReady) {
-		ctx.drawImage(bgImage, xpos, 0);
-		ctx.drawImage(bgImage, bgImage.width - Math.abs(xpos), 0);
+		ctx.drawImage(bgImage, 0, 0);
+		ctx.drawImage(bgImage, bgImage.width, 0);
+		ctx.drawImage(bgImage, 2*bgImage.width, 0);
+		ctx.drawImage(bgImage, 3*bgImage.width, 0);
 	}
-	if (Math.abs(xpos) > bgImage.width) {
-		xpos = 0;
-	}
-	xpos-=2;
-	dino.y+=dino.vel_y;
-	dino.x+=10;
 	if (dino.y <= 0) {
 		dino.y=0;
+	}
+	if (dino.y >= 450) {
+		dino.y=450;
+		dino.jumping= false;
 	}
 	if (dinoReady) {
 		ctx.drawImage(dinoImage, dino.x, dino.y);
 	}
+	if (treeReady) {
+		ctx.drawImage(treeImage, tree.x, tree.y);
+	}
+	var treeWidth=138;
+	var treeHeight=150;
+	var dinoWidth=120;
+	var dinoHeight=130;
+	if (dino.x < tree.x + treeWidth  && dino.x + dinoWidth  > tree.x &&
+		dino.y < tree.y + treeHeight && dino.y + dinoHeight > tree.y) {
+		if (!game_over) {
+			alert("Game Over");
+			location.reload();
+		}
+		game_over = true;
+	}
+	if (tree.x < (dino.x-130)) {
+		tree.x+=800 + Math.floor(Math.random()*1000);
+	}
+	dino.vel+=gravity;
+	dino.y+=dino.vel;
+	dino.x+=20;
+	tree.x-=5;
+	score++;
+	//document.getElementById("score").innerHTML = "Score" + score;
 };
-var offsetX = -10;
+var offsetX = -20;
 var main = function () {
 	var now = Date.now();
 	var delta = now - then;
 	render();
+	score++;
 	keys();
 	then = now;
 	requestAnimationFrame(main);
