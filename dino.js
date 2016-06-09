@@ -1,4 +1,3 @@
-// Create the canvas
 var canvas = document.createElement("canvas");
 var ctx = canvas.getContext("2d");
 canvas.width = 1000;
@@ -55,36 +54,7 @@ addEventListener("keyup", function (e) {
 	keysDown[e.keyCode] = false;
 }, false);
 
-function colCheck(shapeA, shapeB) {
-    // get the vectors to check against
-    var vX = (shapeA.x + (shapeA.width / 2)) - (shapeB.x + (shapeB.width / 2)),
-        vY = (shapeA.y + (shapeA.height / 2)) - (shapeB.y + (shapeB.height / 2)),
-        // add the half widths and half heights of the objects
-        hWidths = (shapeA.width / 2) + (shapeB.width / 2),
-        hHeights = (shapeA.height / 2) + (shapeB.height / 2),
-        colDir = null;
-    if (Math.abs(vX) < hWidths && Math.abs(vY) < hHeights) {   
-            if (vY > 0) {
-                colDir = "t";
-                shapeA.y += oY;
-            } else {
-                colDir = "b";
-                shapeA.y -= oY;
-            }
-        } else {
-            if (vX > 0) {
-                colDir = "l";
-                shapeA.x += oX;
-            } else {
-                colDir = "r";
-                shapeA.x -= oX;
-            }
-        }
-    
-    return colDir;
-}
-
-var gravity = 3 ;  // 2 -> Easy --- 3 -> HARD
+var gravity = 2 ;  // 2 -> Easy --- 3 -> HARD
 var keys = function () {
 	if (keysDown[32]) { // Player holding space
 		if(!dino.jumping) {
@@ -155,4 +125,5 @@ var w = window;
 requestAnimationFrame = w.requestAnimationFrame || w.webkitRequestAnimationFrame || w.msRequestAnimationFrame || w.mozRequestAnimationFrame;
 
 var then = Date.now();
+alert("Welcome to Dino Dash! press Space to jump.");
 main();
